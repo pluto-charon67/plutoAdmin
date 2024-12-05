@@ -1,14 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "noImplicitAny": false,
-    "allowJs": true
+    "allowSyntheticDefaultImports": true, // 运行默认导入node的内置模块
+    "types": ["vite/client"] // 识别vite的特有类型
   },
+  "include": [],
+  "exclude": [
+    "node_modules"
+  ],
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
