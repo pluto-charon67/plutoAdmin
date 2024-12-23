@@ -6,5 +6,5 @@ import { ImportGlobOptions } from 'vite';
  * @param options 配置，默认eager: true,
  */
 export default function (paths: string | Array<string>, options?: ImportGlobOptions<boolean, string> = { eager: true }) {
-    return import.meta.glob(paths, options);
+    return import.meta.glob(`${paths}`, options);
 }
