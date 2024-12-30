@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true, // 运行默认导入node的内置模块
-    "types": ["vite/client"] // 识别vite的特有类型
+    "types": ["vite/client"], // 识别vite的特有类型
+    "baseUrl": "./", // 导入模块时，相对于这个路径进行导入解析，防止模块导入的ts报错
+    "paths": {
+      "@/*": ["./src/*"] // 规定别名导入的ts解析规则，不规定时，则使用@/别名导入的语句会ts类型错误
+    }
   },
-  "include": [],
+  "include": ["src/**/*.ts", "src/**/*.d.ts","src/**/*.tsx","src/**/*.vue"], // 规定ts编译器处理src目录下所有ts、d.ts、tsx和vue文件
   "exclude": [
     "node_modules"
   ],
