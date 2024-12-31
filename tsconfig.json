@@ -1,19 +1,44 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true, // 运行默认导入node的内置模块
-    "types": ["vite/client"], // 识别vite的特有类型
-    "baseUrl": "./", // 导入模块时，相对于这个路径进行导入解析，防止模块导入的ts报错
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": false,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "experimentalDecorators": true,
+    "strictFunctionTypes": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true, // 默认导入node内置模块
+    "allowImportingTsExtensions": true, // 允许导入ts时携带ts后缀
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "types": ["node","vite/client"], // 识别vite的特有类型
+    "baseUrl": ".", // 导入模块时，相对于这个路径进行导入解析，防止模块导入的ts报错
     "paths": {
-      "@/*": ["./src/*"] // 规定别名导入的ts解析规则，不规定时，则使用@/别名导入的语句会ts类型错误
+      "@/*": ["src/*"] // 规定别名导入的ts解析规则，不规定时，则使用@/别名导入的语句会ts类型错误
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts","src/**/*.tsx","src/**/*.vue"], // 规定ts编译器处理src目录下所有ts、d.ts、tsx和vue文件
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "types/*.d.ts",
+    "vite.config.ts"
+  ], // 规定ts编译器处理src目录下所有ts、d.ts、tsx和vue文件
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    "**/*.js"
   ],
   "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
 }
