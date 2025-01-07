@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import Tags from '@/layout/components/tags/index.vue';
 
-const router = useRouter();
-console.log(router);
-const onJumpLogin = () => {
-  router.push({
-    name: 'Login',
-  });
-};
 </script>
 
 <template>
-    <div>布局
-      <button @click="onJumpLogin">得名</button>
+    <div class="app-wrapper">
+      <Tags></Tags>
     </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+.app-wrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+</style>
