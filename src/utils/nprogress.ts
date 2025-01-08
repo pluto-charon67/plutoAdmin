@@ -9,7 +9,7 @@ NProgress.configure({
     // 是否显示加载的icon
     showSpinner: false,
     // 自动递增的间隔
-    tricklesSpeed: 200,
+    trickleSpeed: 200,
     // 初始化的最小百分比
     minimum: 0.3,
 });

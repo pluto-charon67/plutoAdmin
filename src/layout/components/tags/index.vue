@@ -31,6 +31,9 @@ const activeName = ref('first');
                     &:hover .is-icon-close {
                         width: 1em;
                     }
+                    &.is-active {
+                        box-shadow: 0 0 0.7px #888;
+                    }
                 }
             }
         }
