@@ -1,6 +1,7 @@
 import type { PluginOption } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import AutoImport from "unplugin-auto-import/vite";
+import { vitePluginFakeServer } from "vite-plugin-fake-server";
 
 export function getPluginList(): PluginOption[] {
     return  [
@@ -16,6 +17,13 @@ export function getPluginList(): PluginOption[] {
             },
             // 配置文件生成位置
             dts: "./src/auto-import.d.ts",
+        }),
+        vitePluginFakeServer({
+            // 线上部署faker进行数据mock
+            logger: false, // 是否在控制台显示请求日志
+            include: "mock", // 设置存储mock数据的文件夹
+            infixName: false, // 取消mock文件的中缀名
+            enableProd: true, // 是否在生产环境设置mock
         }),
     ];
 }
