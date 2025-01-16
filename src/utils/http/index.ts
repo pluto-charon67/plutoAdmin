@@ -12,7 +12,8 @@ const defaultRequestOptions = {
     withCredentials: true, // 跨域凭证
     // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
     paramsSerializer(params) {
-        return stringify(params, { arrayFormat: 'repeat' });
+        // return stringify(params, { arrayFormat: 'repeat' });
+        return params;
     },
 };
 

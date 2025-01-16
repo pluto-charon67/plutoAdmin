@@ -9,7 +9,7 @@ import type {
 } from 'axios';
 
 // 自定义的拦截器
-export interface CustomInterceptors<T> {
+export interface CustomInterceptors<T = any> {
     requestSuccessFn?: (config: AxiosRequestConfig) => AxiosRequestConfig; // 请求拦截的成功回调
     requestErrorFn?: (err: any) => any; // 请求拦截的失败回调
     responseSuccessFn?: (res: AxiosResponse<T, any>) => any; // 响应拦截的成功回调

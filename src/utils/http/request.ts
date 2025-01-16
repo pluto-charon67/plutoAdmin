@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, CustomRequestConfig, ResponseData, AxiosResponseData } from './type.ts';
+import type { AxiosInstance, InternalAxiosRequestConfig, CustomRequestConfig, ResponseData, AxiosResponseData } from './type.ts';
 
 const whiteList = []; // 不需要token的白名单
 
@@ -27,7 +27,7 @@ class Request {
         const customInterceptors = initConfig?.interceptors;
 
         this.instance.interceptors.request.use(
-            (config: AxiosRequestConfig) => {
+            (config: InternalAxiosRequestConfig) => {
                 if (customInterceptors) {
                     // 自定义的请求实例的请求成功拦截
                     customInterceptors.requestSuccessFn(config);
@@ -53,10 +53,10 @@ class Request {
         const initConfig = this.initConfig;
         const customInterceptors = initConfig?.interceptors;
 
-        this.instance.interceptors.response.use((res: AxiosResponseData) => {
+        this.instance.interceptors.response.use(res => {
             if (customInterceptors) return customInterceptors.responseSuccessFn(res); // 当前实例自定义的响应拦截
 
-            const data = res.data;
+            const data = res.data as ResponseData;
             const { code } = data;
 
             if (code === 200) return data; // 请求成功
@@ -94,7 +94,7 @@ class Request {
                 .request<any, ResponseData<T>>(config)
                 .then(res => {
                     // 单次请求的响应拦截
-                    if (interceptors) res = interceptors.responseSuccessFn(res);
+                    if (interceptors) res = interceptors.responseSuccessFn(res as any);
                     resolve(res);
                 })
                 .catch(err => reject(err));
