@@ -3,13 +3,14 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const onJumpLogin = () => {
-  router.push('/login');
+    router.push('/login');
 };
 </script>
 
 <template>
-    <div>欢迎
-      <button @click="onJumpLogin">等泰康路</button>
+    <div>
+        欢迎
+        <button @click="onJumpLogin">等泰康路</button>
     </div>
 </template>
 

@@ -1,3 +1,4 @@
+import { stringify } from 'qs';
 import Request from './request.ts';
 import type { ResponseData } from './type.ts';
 
@@ -11,9 +12,8 @@ const defaultRequestOptions = {
     },
     withCredentials: true, // 跨域凭证
     // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
-    paramsSerializer(params) {
-        // return stringify(params, { arrayFormat: 'repeat' });
-        return params;
+    paramsSerializer(params: any) {
+        return stringify(params, { arrayFormat: 'repeat' });
     },
 };
 
