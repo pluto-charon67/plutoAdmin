@@ -15,6 +15,10 @@ export function getPluginList(): PluginOption[] {
                 filepath: './.eslintrc-auto-import.json', // 生成的文件路径
                 globalsPropValue: true,
             },
+            // 导入的文件
+            dirs: [
+                '../src/hooks/auto-import/**',
+            ],
             // 配置文件生成位置
             dts: "./src/auto-import.d.ts",
         }),
