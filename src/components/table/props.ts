@@ -1,0 +1,69 @@
+import type { PropType } from "vue";
+import type { Language, DefaultLanguage } from "../../types";
+import defaultProps from "element-plus/es/components/table/src/table/defaults";
+
+// https://github.com/pure-admin/pure-admin-table/blob/main/packages/types/table-props.ts
+export default {
+  tableKey: {
+    type: [String, Number] as PropType<string | number>,
+    default: "0"
+  },
+  columns: {
+    type: Array,
+    default: []
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  loadingConfig: {
+    type: Object,
+    default: () => {}
+  },
+  alignWhole: {
+    type: String,
+    default: "left"
+  },
+  headerAlign: {
+    type: String,
+    default: ""
+  },
+  showOverflowTooltip: {
+    type: Boolean,
+    default: false
+  },
+  rowHoverBgColor: {
+    type: String,
+    default: ""
+  },
+  pagination: {
+    type: Object,
+    default: {
+      total: 0,
+      pageSize: 5,
+      align: "right",
+      size: "default",
+      background: false,
+      pageSizes: [5, 10, 15, 20],
+      layout: "total, sizes, prev, pager, next, jumper"
+    }
+  },
+  adaptive: {
+    type: Boolean,
+    default: false
+  },
+  adaptiveConfig: {
+    type: Object,
+    default: {
+      offsetBottom: 96,
+      fixHeader: true,
+      timeout: 60,
+      zIndex: 3
+    }
+  },
+  locale: {
+    type: [String, Object] as PropType<DefaultLanguage | Language>,
+    default: ""
+  },
+  ...defaultProps
+};

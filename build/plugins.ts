@@ -2,10 +2,12 @@ import type { PluginOption } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import AutoImport from "unplugin-auto-import/vite";
 import { vitePluginFakeServer } from "vite-plugin-fake-server";
+import vueJsx from '@vitejs/plugin-vue-jsx';
 
 export function getPluginList(): PluginOption[] {
     return  [
         vue(),
+        vueJsx(), // 使用jsx
         AutoImport({
             // 自动导入vue相关的函数，如ref，reactive等
             imports: ["vue"],
