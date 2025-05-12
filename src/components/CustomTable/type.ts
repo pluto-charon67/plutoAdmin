@@ -1,6 +1,7 @@
-import type { ElTable, ElTableColumn,ElPagination } from 'element-plus';
+import type { ElTable, ElTableColumn, ElPagination } from 'element-plus';
+import type { CSSProperties } from 'vue';
 
-type A = typeof ElTableColumn['setup'];
+type A = (typeof ElTableColumn)['setup'];
 type V = Parameters<A>;
 
 // 用于展开嵌套泛型
@@ -12,18 +13,25 @@ type ExpandNestedGeneric<T> = T extends object
           : never
     : T;
 
-type TableProps = Partial<Parameters<Exclude<(typeof ElTable)['setup'], undefined>>[0] & {
-    customRender: (...args: any[]) => VNode;
-}>;
+type AlignType = 'left' | 'center' | 'right';
 
-type TableColumnProps =Partial<Parameters<Exclude<(typeof ElTableColumn)['setup'], undefined>>[0] & {
-    customRender: (...args: any[]) => VNode;
-}>;
+type TableProps = Partial<
+    Parameters<Exclude<(typeof ElTable)['setup'], undefined>>[0] & {
+        customRender: (...args: any[]) => VNode;
+    }
+>;
+
+type TableColumnProps = Partial<
+    Parameters<Exclude<(typeof ElTableColumn)['setup'], undefined>>[0] & {
+        customRender: (...args: any[]) => VNode;
+    }
+>;
 
 type PaginationProps = Parameters<Exclude<(typeof ElPagination)['setup'], undefined>>[0] & {
     customRender: (...args: any[]) => VNode;
-}
-
+    style?: CSSProperties; // 覆盖原有分页器的样式
+    align?: AlignType; // 分页器对齐方式
+};
 
 interface CustomTableCloumnProps extends TableColumnProps {
     hide?: boolean | CallableFunction; // 是否隐藏
@@ -48,7 +56,7 @@ interface CustomTableProps extends TableProps {
     tableKey?: string | number; // 表格的唯一标识，如何一个页面存在多个表格，但是只获取到一个表格实例时，设置tableKey可以解决
     paginationProps?: PaginationProps; // 分页器相关的props
     rowHoverBgColor?: string; // 鼠标悬停行背景色
-    showPage?: boolean;// 是否要显示分页器
+    showPage?: boolean; // 是否要显示分页器
     columns: CustomTableCloumnProps[]; // 列配置
     loading?: boolean; // 是否开启加载动画
     align?: 'left' | 'center' | 'right'; // 表格列对齐方式
@@ -56,4 +64,4 @@ interface CustomTableProps extends TableProps {
     adaptiveConfig?: AdaptiveConfig; // 自适应配置
 }
 
-export type { TableColumnProps,TableProps,CustomTableProps,CustomTableCloumnProps,AdaptiveConfig };
+export type { TableColumnProps, TableProps, CustomTableProps, CustomTableCloumnProps, AdaptiveConfig };

@@ -2,7 +2,8 @@
 import useDrawer from '@/hooks/auto-import/useDrawer';
 import CustomTable from '@/components/CustomTable/index';
 // import { CustomTableCloumnProps } from '@/components/Table/types';
-import Table from '@/components/Table/index';
+// import Table from '@/components/Table/index';
+import { VNode } from 'vue';
 
 const activeName = ref('first');
 
@@ -10,7 +11,7 @@ const columns = [
 {
   label: "Date",
   prop: "date",
-  cellRenderer: (data, h, a) => {
+  cellRenderer: (data): VNode => {
     console.log(data)
         return (<div style="color: red;">打撒好看</div>)
     }
@@ -61,7 +62,7 @@ const {
         <div class="ab">
             <CustomTable :columns="columns" :data="tableData"></CustomTable>
             <br>
-            <Table :columns="columns" :data="tableData"></Table>
+            <!-- <Table :columns="columns" :data="tableData"></Table> -->
         </div>
         <el-tabs :closable="true" v-model="activeName">
             <el-tab-pane label="User" name="first">User</el-tab-pane>

@@ -293,6 +293,7 @@ export default defineComponent({
       );
     };
 
+    console.log('第三课', ssr ? isClient.value && renderPureTable() : renderPureTable())
     return () =>
       ssr ? isClient.value && renderPureTable() : renderPureTable();
   }

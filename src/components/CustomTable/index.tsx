@@ -6,23 +6,21 @@ import props from './props';
 import type { CustomTableProps, CustomTableCloumnProps } from './type';
 import Renderer from '../renderer';
 
+interface Emits {
+    (e: 'changePage', value: { page: number; size: number }): void;
+}
+
 export default defineComponent<CustomTableProps>({
     name: 'CustomTable',
     props,
-    emits: [],
+    emits: ['changePage'],
     setup(props, { attrs, slots, emit, expose }) {
         const options = toRefs(props);
-        console.log('表格组件', props, options, '+++');
         const { columns, loading, tableKey, adaptive, adaptiveConfig, align, paginationProps, rowHoverBgColor, showPage } = options;
 
-        // 分页器修改了一页显示多少条数据
-        const handleSizeChange = (val: number) => {
-            console.log('修改有', val);
-        };
-
-        // 分页器修改了页数
-        const handlePageChange = (val: number) => {
-            console.log('修改页数', val);
+        // 分页器修改了页数或一页显示的条数
+        const onchange = (currentPage: number, pageSize: number) => {
+            emit('changePage', { page: currentPage, size: pageSize });
         };
 
         // 渲染列
@@ -88,9 +86,20 @@ export default defineComponent<CustomTableProps>({
             );
         };
 
+        // 获取分页器的样式
+        const getPaginationStyle = computed((): CSSProperties => {
+            const align = unref(paginationProps)?.align;
+            return Object.assign({
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: align === 'left' ? 'flex-start' : align === 'center' ? 'center' : 'flex-end',
+            }, unref(paginationProps)?.style ?? {});
+        })
+
         const renderTable = () => {
             return (
-                <div class="custom-table">
+                <>
                     <ElTable {...props} {...attrs} ref={`TableRef${unref(tableKey)}`}>
                         {{
                             default: () => unref(columns).map((item, index) => renderColumn(item, index)),
@@ -102,18 +111,26 @@ export default defineComponent<CustomTableProps>({
                     {unref(showPage) && (
                         <ElPagination
                             {...unref(paginationProps)}
+                            style={getPaginationStyle}
                             layout={unref(paginationProps).layout ?? 'total, prev, pager, next, jumper'}
                             pageSizes={unref(paginationProps).pageSizes ?? [10, 30, 50, 100]}
-                            onSizeChange={val => handleSizeChange(val)}
-                            onCurrentChange={val => handlePageChange(val)}
+                            onChange={(currentPage: number, pageSize: number) => onchange(currentPage, pageSize)}
                         />
                     )}
-                </div>
+
+
+
+                </>
             );
         };
 
-        const res = renderTable();
-        console.log('表格组件渲染结果', res);
-        return res;
+
+        const renderCustomTable = () => {
+            return (<div class="custom-table">
+                {renderTable()}
+            </div>)
+        }
+
+        return renderCustomTable
     },
 });
