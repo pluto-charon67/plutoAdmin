@@ -14,19 +14,27 @@ export default {
         type: String,
         default: 'center',
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    showPage: {
+        type: Boolean,
+        default: true,
+    },
     rowHoverBgColor: {
         type: String,
         default: '',
     },
-    pagination: {
+    paginationProps: {
         type: Object,
         default: {
             total: 0,
-            pageSize: 5,
+            pageSize: 10,
             align: 'right',
             size: 'default',
             background: false,
-            pageSizes: [5, 10, 15, 20],
+            pageSizes: [10, 20, 50, 100],
             layout: 'total, sizes, prev, pager, next, jumper',
         },
     },

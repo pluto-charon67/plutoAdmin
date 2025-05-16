@@ -2,49 +2,48 @@
 import useDrawer from '@/hooks/auto-import/useDrawer';
 import CustomTable from '@/components/CustomTable/index';
 // import { CustomTableCloumnProps } from '@/components/Table/types';
-// import Table from '@/components/Table/index';
+import Table from '@/components/Table/index';
 import { VNode } from 'vue';
 
 const activeName = ref('first');
 
 const columns = [
-{
-  label: "Date",
-  prop: "date",
-  cellRenderer: (data): VNode => {
-    console.log(data)
-        return (<div style="color: red;">打撒好看</div>)
+    {
+        label: "Date",
+        prop: "date",
+        cellRenderer: ({row}): VNode => {
+            return <div style="color: red;">{row.date}是</div>
+        },
+    }, {
+        label: "Name",
+        prop: "name",
+    }, {
+        label: "Address",
+        prop: "address",
     }
-}, {
-  label: "Name",
-  prop: "name",
-}, {
-  label: "Address",
-  prop: "address",
-}
 ]
 
 const tableData = [
-  {
-    date: '2030-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2030-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2030-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
-  {
-    date: '2030-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles',
-  },
+    {
+        date: '2030-05-01',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2030-05-02',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2030-05-03',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
+    {
+        date: '2030-05-04',
+        name: 'Tom',
+        address: 'No. 189, Grove St, Los Angeles',
+    },
 ]
 
 const {
@@ -61,7 +60,6 @@ const {
         <Drawer />
         <div class="ab">
             <CustomTable :columns="columns" :data="tableData"></CustomTable>
-            <br>
             <!-- <Table :columns="columns" :data="tableData"></Table> -->
         </div>
         <el-tabs :closable="true" v-model="activeName">
@@ -78,19 +76,24 @@ const {
     :deep(.el-tabs) {
         .el-tabs__header {
             margin: 0;
+
             .el-tabs__nav-wrap {
                 &::after {
                     display: none;
                 }
+
                 .el-tabs__item {
                     padding: 0 6px;
+
                     .is-icon-close {
                         width: 0;
                         transition: all 0.2s;
                     }
+
                     &:hover .is-icon-close {
                         width: 1em;
                     }
+
                     &.is-active {
                         box-shadow: 0 0 0.7px #888;
                     }

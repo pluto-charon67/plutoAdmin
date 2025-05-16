@@ -252,6 +252,7 @@ export default defineComponent({
     });
 
     let renderTable = () => {
+      console.log(ElPagination, 'ElPagination',ElTable, '==')
       return (
         <>
           <ElTable {...props} {...attrs} ref={`TableRef${unref(tableKey)}`}>
@@ -261,8 +262,7 @@ export default defineComponent({
               empty: () => slots.empty && slots.empty()
             }}
           </ElTable>
-          {conditions ? (
-            <ElPagination
+          <ElPagination
               {...attrs}
               class="pure-pagination"
               style={unref(getStyle)}
@@ -275,7 +275,6 @@ export default defineComponent({
               onSizeChange={val => handleSizeChange(val)}
               onCurrentChange={val => handleCurrentChange(val)}
             ></ElPagination>
-          ) : null}
         </>
       );
     };

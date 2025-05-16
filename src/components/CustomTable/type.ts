@@ -7,10 +7,10 @@ type V = Parameters<A>;
 // 用于展开嵌套泛型
 type ExpandNestedGeneric<T> = T extends object
     ? T extends Function
-        ? T
-        : T extends infer O
-          ? { [K in keyof O]: ExpandNestedGeneric<O[K]> }
-          : never
+    ? T
+    : T extends infer O
+    ? { [K in keyof O]: ExpandNestedGeneric<O[K]> }
+    : never
     : T;
 
 type AlignType = 'left' | 'center' | 'right';
@@ -43,6 +43,7 @@ interface CustomTableCloumnProps extends TableColumnProps {
     cellRenderer?: (data: any) => VNode | string;
     // 自定义表头渲染器(jsx语法)
     headerRenderer?: (data: any) => VNode | string;
+    showOverflowTooltip?: boolean;
 }
 
 interface AdaptiveConfig {
@@ -64,4 +65,4 @@ interface CustomTableProps extends TableProps {
     adaptiveConfig?: AdaptiveConfig; // 自适应配置
 }
 
-export type { TableColumnProps, TableProps, CustomTableProps, CustomTableCloumnProps, AdaptiveConfig };
+export type { TableColumnProps, TableProps, CustomTableProps, CustomTableCloumnProps, AdaptiveConfig, PaginationProps };
