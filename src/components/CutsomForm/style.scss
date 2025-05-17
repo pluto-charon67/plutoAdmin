@@ -1,0 +1,32 @@
+.ma-form {
+  width: 100%;
+  
+  &.is-loading {
+    position: relative;
+    pointer-events: none;
+  }
+
+  .el-form-item {
+    margin-bottom: 18px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .el-row {
+    margin: 0 -10px;
+    
+    .el-col {
+      padding: 0 10px;
+    }
+  }
+
+  .el-space {
+    width: 100%;
+    
+    &.is-vertical {
+      flex-direction: column;
+    }
+  }
+} 

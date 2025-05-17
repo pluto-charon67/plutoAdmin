@@ -3,7 +3,8 @@ import useDrawer from '@/hooks/auto-import/useDrawer';
 import CustomTable from '@/components/CustomTable/index';
 // import { CustomTableCloumnProps } from '@/components/Table/types';
 import Table from '@/components/Table/index';
-import { VNode } from 'vue';
+import { VNode, Fragment } from 'vue';
+import CustomForm from '@/components/CutsomForm/index';
 
 const activeName = ref('first');
 
@@ -52,6 +53,72 @@ const {
 } = useDrawer({
     title: '详情'
 });
+
+// 添加表单相关的数据
+const formData = ref({
+    username: '',
+    password: '',
+    remember: false,
+    type: '1'
+});
+
+const formOptions = {
+    labelWidth: '120px',
+    layout: 'flex' as const,
+    flex: {
+        gutter: 20
+    }
+};
+
+const formItems = [
+    {
+        label: '用户名',
+        prop: 'username',
+        render: 'el-input',
+        renderProps: {
+            placeholder: '请输入用户名'
+        },
+        cols: {
+            span: 12
+        }
+    },
+    {
+        label: '密码',
+        prop: 'password',
+        render: 'el-input',
+        renderProps: {
+            type: 'password',
+            placeholder: '请输入密码'
+        },
+        cols: {
+            span: 12
+        }
+    },
+    {
+        label: '记住我',
+        prop: 'remember',
+        render: 'el-switch',
+        cols: {
+            span: 12
+        }
+    },
+    {
+        label: '用户类型',
+        prop: 'type',
+        render: (data) => {
+            console.log(data);
+            return (<el-select 
+                placeholder="请选择用户类型"
+            >
+                <el-option label="管理员" value="1" />
+                <el-option label="普通用户" value="2" />
+            </el-select>)
+        },
+        cols: {
+            span: 12
+        }
+    }
+];
 </script>
 
 <template>
@@ -59,6 +126,11 @@ const {
         <button @click="open">的</button>
         <Drawer />
         <div class="ab">
+            <CustomForm
+                v-model="formData"
+                :options="formOptions"
+                :items="formItems"
+            />
             <CustomTable :columns="columns" :data="tableData"></CustomTable>
             <!-- <Table :columns="columns" :data="tableData"></Table> -->
         </div>
@@ -100,6 +172,12 @@ const {
                 }
             }
         }
+    }
+    :deep(.custom-form) {
+        padding: 20px;
+        background: #fff;
+        border-radius: 4px;
+        margin-bottom: 20px;
     }
 }
 </style>
