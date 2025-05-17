@@ -3,8 +3,10 @@ import useDrawer from '@/hooks/auto-import/useDrawer';
 import CustomTable from '@/components/CustomTable/index';
 // import { CustomTableCloumnProps } from '@/components/Table/types';
 import Table from '@/components/Table/index';
-import { VNode, Fragment } from 'vue';
+import { VNode, ref, h, Fragment } from 'vue';
 import CustomForm from '@/components/CutsomForm/index';
+import CustomSearch from '@/components/CustomSearch/index';
+import '@/components/CustomSearch/style.scss';
 
 const activeName = ref('first');
 
@@ -97,7 +99,10 @@ const formItems = [
     {
         label: '记住我',
         prop: 'remember',
-        render: 'el-switch',
+        // render: 'el-switch',
+        render: () => {
+            return (<el-switch />)
+        },
         cols: {
             span: 12
         }
@@ -119,6 +124,99 @@ const formItems = [
         }
     }
 ];
+
+// 添加搜索相关的数据
+const searchData = ref({
+    keyword: '',
+    status: '',
+    dateRange: [],
+    category: []
+});
+
+const searchOptions = {
+    fold: true,
+    foldRows: 1,
+    cols: {
+        xs: 1,
+        sm: 2,
+        md: 2,
+        lg: 3,
+        xl: 4
+    }
+};
+
+const searchItems = [
+    {
+        label: '关键词',
+        prop: 'keyword',
+        render: 'el-input',
+        renderProps: {
+            placeholder: '请输入关键词'
+        }
+    },
+    {
+        label: '状态',
+        prop: 'status',
+        render: 'el-select',
+        renderProps: {
+            placeholder: '请选择状态'
+        },
+        children: [
+            {
+                render: () => {
+                    return h(Fragment, null, [
+                        h('el-option', { label: "启用", value: "1" }),
+                        h('el-option', { label: "禁用", value: "0" })
+                    ]);
+                }
+            }
+        ]
+    },
+    {
+        label: '日期范围',
+        prop: 'dateRange',
+        render: 'el-date-picker',
+        renderProps: {
+            type: 'daterange',
+            startPlaceholder: '开始日期',
+            endPlaceholder: '结束日期',
+            valueFormat: 'YYYY-MM-DD'
+        },
+        span: 2  // 跨两列
+    },
+    {
+        label: '分类',
+        prop: 'category',
+        render: 'el-select',
+        renderProps: {
+            multiple: true,
+            placeholder: '请选择分类'
+        },
+        hide: () => false,  // 可以根据条件动态显示隐藏
+        children: [
+            {
+                render: () => {
+                    return h(Fragment, null, [
+                        h('el-option', { label: "分类1", value: "1" }),
+                        h('el-option', { label: "分类2", value: "2" }),
+                        h('el-option', { label: "分类3", value: "3" })
+                    ]);
+                }
+            }
+        ]
+    }
+];
+
+// 处理搜索
+const handleSearch = (data) => {
+    console.log('搜索数据:', data);
+    // 这里可以发起请求等操作
+};
+
+// 处理重置
+const handleReset = (data) => {
+    console.log('重置数据:', data);
+};
 </script>
 
 <template>
@@ -126,11 +224,27 @@ const formItems = [
         <button @click="open">的</button>
         <Drawer />
         <div class="ab">
+            <!-- 搜索组件示例 -->
+            <div class="search-container">
+                <h3>搜索组件示例</h3>
+                <CustomSearch
+                    v-model="searchData"
+                    :options="searchOptions"
+                    :searchItems="searchItems"
+                    @search="handleSearch"
+                    @reset="handleReset"
+                />
+            </div>
+
+            <!-- 表单组件示例 -->
+            <h3>表单组件示例</h3>
             <CustomForm
                 v-model="formData"
                 :options="formOptions"
                 :items="formItems"
             />
+            
+            <h3>表格组件示例</h3>
             <CustomTable :columns="columns" :data="tableData"></CustomTable>
             <!-- <Table :columns="columns" :data="tableData"></Table> -->
         </div>
@@ -178,6 +292,22 @@ const formItems = [
         background: #fff;
         border-radius: 4px;
         margin-bottom: 20px;
+    }
+    
+    .search-container {
+        margin-bottom: 20px;
+    }
+    
+    h3 {
+        margin: 10px 0;
+        font-size: 16px;
+        font-weight: 500;
+    }
+    
+    :deep(.custom-search) {
+        background: #fff;
+        padding: 20px;
+        border-radius: 4px;
     }
 }
 </style>
