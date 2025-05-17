@@ -135,7 +135,7 @@ const searchData = ref({
 
 const searchOptions = {
     fold: true,
-    foldRows: 1,
+    foldRows: 2,
     cols: {
         xs: 1,
         sm: 2,
@@ -228,7 +228,6 @@ const handleReset = (data) => {
             <div class="search-container">
                 <h3>搜索组件示例</h3>
                 <CustomSearch
-                    v-model="searchData"
                     :options="searchOptions"
                     :searchItems="searchItems"
                     @search="handleSearch"

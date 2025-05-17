@@ -1,4 +1,4 @@
-import { defineComponent, ref, PropType, computed, Fragment, h } from 'vue'
+import { defineComponent, ref, PropType, computed, Fragment, h, watch } from 'vue'
 import { ElButton, ElRow, ElCol } from 'element-plus'
 import { MaSearchProps, MaSearchOptions, MaSearchItem, MaSearchExpose } from './types'
 import { MaFormOptions } from '../CutsomForm/types'
@@ -9,7 +9,11 @@ export default defineComponent({
   props: {
     modelValue: {
       type: Object as PropType<Record<string, any>>,
-      required: true
+      default: () => ({})
+    },
+    defaultValue: {
+      type: Object as PropType<Record<string, any>>,
+      default: () => ({})
     },
     options: {
       type: Object as PropType<MaSearchOptions>,
@@ -24,7 +28,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['update:modelValue', 'search', 'reset', 'fold'],
+  emits: ['search', 'reset', 'fold', 'update:modelValue'],
   setup(props, { emit, expose, slots }) {
     const formRef = ref()
     const searchOptions = ref<MaSearchOptions>({
@@ -40,6 +44,39 @@ export default defineComponent({
       ...props.options
     })
     const searchItems = ref<MaSearchItem[]>(props.searchItems)
+
+    // 内部维护的表单数据
+    const formData = ref<Record<string, any>>({})
+
+    // 初始化表单数据
+    const initFormData = () => {
+      const data: Record<string, any> = {}
+      searchItems.value.forEach(item => {
+        if (item.prop) {
+          // 优先使用 props.defaultValue，其次使用 options.defaultValue
+          data[item.prop] = props.defaultValue[item.prop] ?? 
+                           searchOptions.value.defaultValue?.[item.prop] ?? 
+                           undefined
+        }
+      })
+      formData.value = data
+      // 触发更新事件
+      emit('update:modelValue', data)
+    }
+
+    // 监听 searchItems 变化，重新初始化表单数据
+    watch(() => props.searchItems, () => {
+      searchItems.value = props.searchItems
+      initFormData()
+    }, { deep: true })
+
+    // 监听默认值变化
+    watch([() => props.defaultValue, () => props.options?.defaultValue], () => {
+      initFormData()
+    }, { deep: true })
+
+    // 初始化
+    initFormData()
 
     // 计算实际显示的表单项
     const visibleItems = computed(() => {
@@ -68,7 +105,7 @@ export default defineComponent({
       return visibleItems.value.length > foldRows * (currentCols.value || 1)
     })
 
-    // 计算显示的表单项 - 将内联计算改为响应式计算属性
+    // 计算显示的表单项
     const displayItems = computed(() => {
       return searchOptions.value.fold
         ? visibleItems.value.slice(0, searchOptions.value.foldRows * currentCols.value)
@@ -77,14 +114,13 @@ export default defineComponent({
 
     // 处理搜索
     const handleSearch = () => {
-      emit('search', props.modelValue)
+      emit('search', formData.value)
     }
 
     // 处理重置
     const handleReset = () => {
-      const defaultValue = searchOptions.value.defaultValue || {}
-      emit('update:modelValue', { ...defaultValue })
-      emit('reset', defaultValue)
+      initFormData() // 重置为默认值
+      emit('reset', formData.value)
     }
 
     // 处理折叠切换
@@ -98,16 +134,20 @@ export default defineComponent({
       getMaFormRef: () => formRef.value,
       foldToggle: handleFoldToggle,
       getFold: () => searchOptions.value.fold,
-      setSearchForm: (form: any) => {
-        emit('update:modelValue', { ...form })
+      setSearchForm: (form: Record<string, any>) => {
+        formData.value = { ...form }
+        emit('update:modelValue', formData.value)
       },
-      getSearchForm: () => props.modelValue,
+      getSearchForm: () => formData.value,
       setShowState: (show: boolean) => {
         searchOptions.value.show = show
       },
       getShowState: () => searchOptions.value.show,
       setOptions: (options: MaSearchOptions) => {
         searchOptions.value = options
+        if (options.defaultValue) {
+          initFormData() // 更新默认值时重新初始化
+        }
       },
       getOptions: () => searchOptions.value,
       setFormOptions: (options: MaFormOptions) => {
@@ -116,15 +156,25 @@ export default defineComponent({
       getFormOptions: () => formRef.value?.getOptions(),
       setItems: (items: MaSearchItem[]) => {
         searchItems.value = items
+        initFormData()
       },
       getItems: () => searchItems.value,
       appendItem: (item: MaSearchItem) => {
         searchItems.value.push(item)
+        if (item.prop) {
+          const defaultValue = props.defaultValue[item.prop] ?? 
+                             searchOptions.value.defaultValue?.[item.prop] ?? 
+                             undefined
+          formData.value[item.prop] = defaultValue
+          emit('update:modelValue', formData.value)
+        }
       },
       removeItem: (prop: string) => {
         const index = searchItems.value.findIndex(item => item.prop === prop)
         if (index > -1) {
           searchItems.value.splice(index, 1)
+          delete formData.value[prop]
+          emit('update:modelValue', formData.value)
         }
       },
       getItemByProp: (prop: string) => {
@@ -139,7 +189,7 @@ export default defineComponent({
         <div class="custom-search">
           <CustomForm
             ref={formRef}
-            modelValue={props.modelValue}
+            modelValue={formData.value}
             options={{
               layout: 'flex',
               flex: {
@@ -154,7 +204,10 @@ export default defineComponent({
                 ...item.cols
               }
             }))}
-            onUpdate:modelValue={(val: any) => emit('update:modelValue', val)}
+            onUpdate:modelValue={(val: Record<string, any>) => {
+              formData.value = val
+              emit('update:modelValue', val)
+            }}
           >
             {{
               footer: () => (
