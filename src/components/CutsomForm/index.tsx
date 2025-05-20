@@ -82,7 +82,7 @@ export default defineComponent({
           return h(Component, {
             ...commonProps,
             ...item.renderProps,
-          }, renderChildren())
+          }, { default: () => renderChildren() })
         }
 
         // 处理渲染函数
@@ -91,10 +91,11 @@ export default defineComponent({
           // 如果返回的是组件VNode且有prop，我们需要合并props,并添加可能存在的子组件
           // 渲染函数自身的props优先级要比通用的高
           if (prop && isVNode(vnode) && typeof vnode.type === 'object') {
+            // 直接返回vnode，保留原始的children子节点
             return h(vnode.type as Component, {
               ...commonProps,
               ...vnode.props,
-            }, { default: () => renderChildren() })
+            }, vnode.children || { default: () => renderChildren() })  // 如果是组件VNode，则直接返回vnode，保留原始的children子节点，否则使用renderChildren，兼容jsx子节点和children对象的渲染
           }
           return vnode
         }
