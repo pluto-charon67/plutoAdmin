@@ -50,7 +50,7 @@ export default defineComponent({
       const renderComponent = () => {
         if (!item.render) return null
 
-        // 构建通用的props，用于自动进行数据的双向绑定，如v-model
+        // 构建通用的props，用于自动进行数据
         const commonProps = prop ? {
           modelValue: props.modelValue[prop],
           'onUpdate:modelValue': (val: any) => {
@@ -58,12 +58,31 @@ export default defineComponent({
           }
         } : {}
 
+        // 处理子节点
+        const renderChildren = () => {
+          console.log('renderChildren', item.children)
+          if (!item.children || item.children.length === 0) return null
+          return item.children.map(child => {
+            if (child.render) {
+              if (isRenderFunction(child.render)) {
+                return child.render(props.modelValue)
+              } else if (isString(child.render)) {
+                const ChildComp = resolveComponent(child.render)
+                return h(ChildComp, { ...child.renderProps })
+              } else {
+                return h(child.render as Component, { ...child.renderProps })
+              }
+            }
+            return null
+          })
+        }
+
         if (isString(item.render)) {
           const Component = resolveComponent(item.render)
           return h(Component, {
             ...commonProps,
             ...item.renderProps,
-          })
+          }, renderChildren())
         }
 
         // 处理渲染函数
@@ -75,7 +94,7 @@ export default defineComponent({
             return h(vnode.type as Component, {
               ...commonProps,
               ...vnode.props,
-            }, vnode.children)
+            }, { default: () => renderChildren() })
           }
           return vnode
         }
@@ -84,7 +103,7 @@ export default defineComponent({
         return h(item.render as Component, {
           ...commonProps,
           ...item.renderProps,
-        })
+        }, { default: () => renderChildren() })
       }
 
       const formItemContent = (
@@ -95,7 +114,6 @@ export default defineComponent({
           v-slots={item.itemSlots}
         >
           {renderComponent()}
-          {item.children?.map(child => renderFormItem(child))}
         </ElFormItem>
       )
 
