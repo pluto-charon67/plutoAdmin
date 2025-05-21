@@ -43,7 +43,6 @@ interface CustomTableCloumnProps extends TableColumnProps {
     cellRenderer?: (data: any) => VNode | string;
     // 自定义表头渲染器(jsx语法)
     headerRenderer?: (data: any) => VNode | string;
-    showOverflowTooltip?: boolean;
 }
 
 interface AdaptiveConfig {

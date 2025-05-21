@@ -1,10 +1,13 @@
 .custom-search {
+  box-sizing: border-box;
+  padding: 0 4px;
+  .el-form-item {
+    margin-bottom: 8px;
+  }
   &__actions {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    margin-top: 20px;
-    padding: 0 20px;
+    justify-content: flex-end;
     
     .el-button {
       margin-right: 12px;

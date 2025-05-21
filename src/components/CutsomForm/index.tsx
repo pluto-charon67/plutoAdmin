@@ -1,10 +1,10 @@
-import { defineComponent, ref, PropType, computed } from 'vue'
+import { defineComponent, ref, PropType, computed, watch, nextTick } from 'vue'
 import { ElForm, ElFormItem, ElRow, ElCol, ElSpace, ElLoadingDirective } from 'element-plus'
 import { MaFormProps, MaFormOptions, MaFormItem, MaFormExpose } from './types'
 import { resolveComponent, h, VNode, Component, isVNode } from 'vue'
 import { isFunction, isString } from '@/utils/typeUtils'
 
-export default defineComponent({
+export default defineComponent<MaFormProps>({
   name: 'CustomForm',
   directives: {
     Loading: ElLoadingDirective
@@ -28,6 +28,36 @@ export default defineComponent({
     const formRef = ref<InstanceType<typeof ElForm>>()
     const formOptions = ref<MaFormOptions>(props.options)
     const formItems = ref<MaFormItem[]>(props.items)
+    
+    // 处理表单项显示/隐藏对表单值的影响 表单项的hide为true时，从表单值中移除该属性，show为false时，表单值保留该属性
+    const updateModelValueBasedOnHideState = () => {
+      // 存在hide为true的表单项时，去更新父组件的modelValue，因为需要再表单值内删除该属性
+      const shouldUpdate = formItems.value.some(item => {
+        const prop = isFunction(item.prop) ? item.prop() : item.prop
+        return prop && item.hide;
+      });
+      
+      if (shouldUpdate) {
+        const newModelValue = { ...props.modelValue };
+        formItems.value.forEach(item => {
+          const prop = isFunction(item.prop) ? item.prop() : item.prop;
+          if (prop && item.hide) delete newModelValue[prop];
+        });
+        emit('update:modelValue', newModelValue);
+      }
+    }
+    
+    // 监听表单项变化
+    watch(() => [...formItems.value], () => {
+      nextTick(() => {
+        updateModelValueBasedOnHideState();
+      });
+    }, { deep: true });
+    
+    // 初始化时执行一次
+    nextTick(() => {
+      updateModelValueBasedOnHideState();
+    });
 
     // 判断是否为渲染函数
     const isRenderFunction = (value: unknown): value is (data: any) => VNode => {
@@ -41,16 +71,17 @@ export default defineComponent({
 
     // 渲染表单项
     const renderFormItem = (item: MaFormItem) => {
+      // 如果表单项隐藏或显示为false，则不渲染
       if (item.hide || item.show === false) return null
 
-      const label = typeof item.label === 'function' ? item.label() : item.label
-      const prop = typeof item.prop === 'function' ? item.prop() : item.prop
+      const label = isFunction(item.label) ? item.label() : item.label
+      const prop = isFunction(item.prop) ? item.prop() : item.prop
 
       // 处理渲染组件
       const renderComponent = () => {
         if (!item.render) return null
 
-        // 构建通用的props，用于自动进行数据
+        // 构建通用的props，用于自动进行绑定数据
         const commonProps = prop ? {
           modelValue: props.modelValue[prop],
           'onUpdate:modelValue': (val: any) => {
@@ -60,7 +91,6 @@ export default defineComponent({
 
         // 处理子节点
         const renderChildren = () => {
-          console.log('renderChildren', item.children)
           if (!item.children || item.children.length === 0) return null
           return item.children.map(child => {
             if (child.render) {
@@ -78,6 +108,7 @@ export default defineComponent({
         }
 
         if (isString(item.render)) {
+          // 动态解析字符串为实际的组件，全局组件都可以这样解析，如render: 'el-input'
           const Component = resolveComponent(item.render)
           return h(Component, {
             ...commonProps,
@@ -112,6 +143,7 @@ export default defineComponent({
           label={label}
           prop={prop}
           {...item.itemProps}
+          // 插入表单项的其他插槽
           v-slots={item.itemSlots}
         >
           {renderComponent()}
@@ -127,15 +159,18 @@ export default defineComponent({
         )
       }
 
+      // 处理栅格布局和普通布局
       return formItemContent
     }
 
     // 渲染表单内容
     const renderFormContent = () => {
       if (slots.default) {
+        // 模板使用方法的优先级高于函数渲染
         return slots.default()
       }
 
+      // 表单flex布局
       if (formOptions.value.layout === 'flex') {
         return (
           <ElRow {...formOptions.value.flex}>
@@ -152,6 +187,7 @@ export default defineComponent({
         )
       }
 
+      // 表单默认布局-从上到下垂直布局
       return formItems.value.map(item => renderFormItem(item))
     }
 
@@ -194,17 +230,12 @@ export default defineComponent({
         <ElForm
           ref={formRef}
           class={containerClass.value}
-          model={props.modelValue}
           {...formOptions.value}
+          model={props.modelValue}
           v-loading={formOptions.value.loading}
-          element-loading-text={formOptions.value.loadingConfig?.text}
-          element-loading-spinner={formOptions.value.loadingConfig?.spinner}
-          element-loading-svg={formOptions.value.loadingConfig?.svg}
-          element-loading-view-box={formOptions.value.loadingConfig?.viewBox}
-          element-loading-background={formOptions.value.loadingConfig?.background}
-          element-loading-custom-class={formOptions.value.loadingConfig?.customClass}
         >
           {renderFormContent()}
+          {/* 模板使用方法的插槽优先于函数渲染插槽 */}
           {slots.footer?.() || formOptions.value.footerSlot?.()}
         </ElForm>
       )

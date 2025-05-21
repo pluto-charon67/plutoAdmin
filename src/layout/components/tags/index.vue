@@ -2,7 +2,7 @@
 import useDrawer from '@/hooks/auto-import/useDrawer';
 import CustomTable from '@/components/CustomTable/index';
 // import { CustomTableCloumnProps } from '@/components/Table/types';
-import Table from '@/components/Table/index';
+import Table from '@/components/table/index';
 import { VNode, ref, h, Fragment } from 'vue';
 import CustomForm from '@/components/CutsomForm/index';
 import CustomSearch from '@/components/CustomSearch/index';
@@ -135,14 +135,6 @@ const searchData = ref({
 
 const searchOptions = {
     fold: true,
-    foldRows: 2,
-    cols: {
-        xs: 1,
-        sm: 2,
-        md: 2,
-        lg: 3,
-        xl: 4
-    }
 };
 
 const searchItems = [
@@ -163,14 +155,14 @@ const searchItems = [
         },
         children: [
             {
-                render: () => {
-                    return h(Fragment, null, [
-                        h('el-option', { label: "启用", value: "1" }),
-                        h('el-option', { label: "禁用", value: "0" })
-                    ]);
-                }
+                render: 'el-option',
+                renderProps: { label: "启用", value: 1 }
+            },
+            {
+                render: 'el-option',
+                renderProps: { label: "禁用", value: 2 }
             }
-        ]
+        ],
     },
     {
         label: '日期范围',
@@ -182,7 +174,6 @@ const searchItems = [
             endPlaceholder: '结束日期',
             valueFormat: 'YYYY-MM-DD'
         },
-        span: 2  // 跨两列
     },
     {
         label: '分类',
@@ -192,16 +183,18 @@ const searchItems = [
             multiple: true,
             placeholder: '请选择分类'
         },
-        hide: () => false,  // 可以根据条件动态显示隐藏
         children: [
             {
-                render: () => {
-                    return h(Fragment, null, [
-                        h('el-option', { label: "分类1", value: "1" }),
-                        h('el-option', { label: "分类2", value: "2" }),
-                        h('el-option', { label: "分类3", value: "3" })
-                    ]);
-                }
+                render: 'el-option',
+                renderProps: { label: "分类1", value: "1" }
+            },
+            {
+                render: 'el-option',
+                renderProps: { label: "分类2", value: "2" }
+            },
+            {
+                render: 'el-option',
+                renderProps: { label: "分类3", value: "3" }
             }
         ]
     }
@@ -286,12 +279,6 @@ const handleReset = (data) => {
             }
         }
     }
-    :deep(.custom-form) {
-        padding: 20px;
-        background: #fff;
-        border-radius: 4px;
-        margin-bottom: 20px;
-    }
     
     .search-container {
         margin-bottom: 20px;
@@ -301,12 +288,6 @@ const handleReset = (data) => {
         margin: 10px 0;
         font-size: 16px;
         font-weight: 500;
-    }
-    
-    :deep(.custom-search) {
-        background: #fff;
-        padding: 20px;
-        border-radius: 4px;
     }
 }
 </style>

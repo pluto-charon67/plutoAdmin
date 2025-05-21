@@ -1,5 +1,6 @@
 import { defineComponent, ref, PropType, computed, Fragment, h, watch } from 'vue'
-import { ElButton, ElRow, ElCol } from 'element-plus'
+import { ElButton, ElRow, ElCol, } from 'element-plus'
+import { ArrowUpBold, ArrowDownBold } from '@element-plus/icons-vue'
 import { MaSearchProps, MaSearchOptions, MaSearchItem, MaSearchExpose } from './types'
 import { MaFormOptions } from '../CutsomForm/types'
 import CustomForm from '../CutsomForm'
@@ -32,8 +33,15 @@ export default defineComponent({
   setup(props, { emit, expose, slots }) {
     const formRef = ref()
     const searchOptions = ref<MaSearchOptions>({
-      fold: false,
-      foldRows: 2,
+      fold: props.options?.fold ?? false,
+      foldRows: props.options?.foldRows ?? 2,
+      cols: props.options?.cols ?? {
+        xs: 2,
+        sm: 3,
+        md: 4,
+        lg: 6,
+        xl: 6
+      },
       show: true,
       text: {
         searchBtn: () => '搜索',
@@ -54,9 +62,9 @@ export default defineComponent({
       searchItems.value.forEach(item => {
         if (item.prop) {
           // 优先使用 props.defaultValue，其次使用 options.defaultValue
-          data[item.prop] = props.defaultValue[item.prop] ?? 
-                           searchOptions.value.defaultValue?.[item.prop] ?? 
-                           undefined
+          data[item.prop] = props.defaultValue[item.prop] ??
+            searchOptions.value.defaultValue?.[item.prop] ??
+            undefined
         }
       })
       formData.value = data
@@ -91,12 +99,13 @@ export default defineComponent({
     // 计算当前显示的列数
     const currentCols = computed(() => {
       const width = window.innerWidth
+      console.log('width', width,'===')
       const { cols = {} } = searchOptions.value
-      if (width < 768) return cols.xs || 1
-      if (width < 992) return cols.sm || 2
-      if (width < 1200) return cols.md || 2
-      if (width < 1920) return cols.lg || 3
-      return cols.xl || 4
+      if (width < 768) return cols.xs || 2
+      if (width < 992) return cols.sm || 3
+      if (width < 1200) return cols.md || 4
+      if (width < 1920) return cols.lg || 6
+      return cols.xl || 6
     })
 
     // 计算是否需要显示折叠按钮
@@ -107,9 +116,10 @@ export default defineComponent({
 
     // 计算显示的表单项
     const displayItems = computed(() => {
-      return searchOptions.value.fold
+      const items = searchOptions.value.fold
         ? visibleItems.value.slice(0, searchOptions.value.foldRows * currentCols.value)
         : visibleItems.value
+      return items
     })
 
     // 处理搜索
@@ -129,6 +139,18 @@ export default defineComponent({
       emit('fold', searchOptions.value.fold)
     }
 
+    const itemList = computed(() => {
+      console.log('itemList', currentCols.value,'===')
+      return displayItems.value.map(item => {
+        return {
+          ...item,
+          cols: {
+            span: 24 / currentCols.value,
+            ...item.cols
+          }
+        };
+      });
+    })
     // 暴露方法
     expose({
       getMaFormRef: () => formRef.value,
@@ -162,9 +184,9 @@ export default defineComponent({
       appendItem: (item: MaSearchItem) => {
         searchItems.value.push(item)
         if (item.prop) {
-          const defaultValue = props.defaultValue[item.prop] ?? 
-                             searchOptions.value.defaultValue?.[item.prop] ?? 
-                             undefined
+          const defaultValue = props.defaultValue[item.prop] ??
+            searchOptions.value.defaultValue?.[item.prop] ??
+            undefined
           formData.value[item.prop] = defaultValue
           emit('update:modelValue', formData.value)
         }
@@ -197,13 +219,7 @@ export default defineComponent({
               },
               ...props.formOptions
             }}
-            items={displayItems.value.map(item => ({
-              ...item,
-              cols: {
-                span: 24 / currentCols.value,
-                ...item.cols
-              }
-            }))}
+            items={itemList}
             onUpdate:modelValue={(val: Record<string, any>) => {
               formData.value = val
               emit('update:modelValue', val)
@@ -215,20 +231,25 @@ export default defineComponent({
                   {slots.beforeActions?.()}
                   {slots.actions?.() || (
                     h(Fragment, null, [
-                      h(ElButton, { 
-                        type: 'primary', 
-                        onClick: handleSearch 
+                      h(ElButton, {
+                        type: 'primary',
+                        onClick: handleSearch
                       }, () => searchOptions.value.text?.searchBtn?.()),
-                      h(ElButton, { 
-                        onClick: handleReset 
+                      h(ElButton, {
+                        onClick: handleReset
                       }, () => searchOptions.value.text?.resetBtn?.())
                     ])
                   )}
                   {showFoldBtn.value && (
-                    <ElButton link type="primary" onClick={handleFoldToggle}>
-                      {searchOptions.value.fold
-                        ? searchOptions.value.text?.isFoldBtn?.()
-                        : searchOptions.value.text?.notFoldBtn?.()}
+                    <ElButton type="text" onClick={handleFoldToggle}>
+                      {{
+                        default: () => searchOptions.value.fold
+                          ? searchOptions.value.text?.isFoldBtn?.()
+                          : searchOptions.value.text?.notFoldBtn?.(),
+                        icon: () => searchOptions.value.fold
+                          ? <ArrowDownBold /> 
+                          : <ArrowUpBold />
+                      }}
                     </ElButton>
                   )}
                   {slots.afterActions?.()}

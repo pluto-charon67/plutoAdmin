@@ -1,4 +1,4 @@
-import { FormInstance, FormItemProps } from 'element-plus'
+import { FormInstance, type FormItemProps, type FormProps } from 'element-plus'
 import { Component } from 'vue'
 
 export interface LoadingConfig {
@@ -10,10 +10,10 @@ export interface LoadingConfig {
   customClass?: string // 自定义类名
 }
 
-export interface MaFormOptions {
+export interface MaFormOptions extends Partial<Omit<FormProps, 'model'>> {
   containerClass?: string // 容器类名
   loading?: boolean // 是否显示加载状态
-  loadingConfig?: LoadingConfig // 加载配置
+  // loadingConfig?: LoadingConfig // 加载配置
   layout?: 'flex' | 'grid' // 布局方式
   grid?: {
     size?: number | [number, number] // 栅格大小
@@ -26,7 +26,6 @@ export interface MaFormOptions {
     align?: 'top' | 'middle' | 'bottom' // 垂直对齐方式
   }
   footerSlot?: () => JSX.Element // 底部插槽
-  [key: string]: any // 其他配置
 }
 
 export interface MaFormItem {
@@ -40,7 +39,7 @@ export interface MaFormItem {
     pull?: number // 拉取
     push?: number // 推入
   }
-  itemProps?: Partial<FormItemProps> // 表单项配置
+  itemProps?: Omit<Partial<FormItemProps>, 'label' | 'prop'> // 表单项配置
   itemSlots?: Record<string, (...args: any[]) => JSX.Element> // 表单项插槽
   render?: string | Component | ((data: any) => JSX.Element) // 渲染
   renderProps?: Record<string, any> // 渲染配置
