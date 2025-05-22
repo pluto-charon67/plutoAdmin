@@ -57,11 +57,21 @@ const {
 });
 
 // 添加表单相关的数据
-const formData = ref({
+const formData = ref<{
+    username: string;
+    password: string;
+    remember: boolean;
+    type: string;
+    timeRange: any[];
+    activityStartTime?: string;
+    activityEndTime?: string;
+    [key: string]: any; // 允许添加其他动态属性
+}>({
     username: '',
     password: '',
     remember: false,
-    type: '1'
+    type: '1',
+    timeRange: []
 });
 
 const formOptions = {
@@ -122,11 +132,39 @@ const formItems = [
         cols: {
             span: 12
         }
+    },
+    {
+        label: '活动时间',
+        prop: 'timeRange',
+        render: 'el-date-picker',
+        renderProps: {
+            type: 'datetimerange',
+            startPlaceholder: '开始时间',
+            endPlaceholder: '结束时间',
+            valueFormat: 'YYYY-MM-DD HH:mm:ss',
+            rangeSeparator: '至'
+        },
+        rangeMapping: {
+            startProp: 'activityStartTime',
+            endProp: 'activityEndTime',
+            keepArrayProp: false
+        },
+        cols: {
+            span: 24
+        }
     }
 ];
 
 // 添加搜索相关的数据
-const searchData = ref({
+const searchData = ref<{
+    keyword: string;
+    status: string;
+    dateRange: any[];
+    category: any[];
+    startDate?: string;
+    endDate?: string;
+    [key: string]: any; // 允许添加其他动态属性
+}>({
     keyword: '',
     status: '',
     dateRange: [],
@@ -174,6 +212,10 @@ const searchItems = [
             endPlaceholder: '结束日期',
             valueFormat: 'YYYY-MM-DD'
         },
+        rangeMapping: {
+            startProp: 'startDate',
+            endProp: 'endDate'
+        }
     },
     {
         label: '分类',
@@ -203,12 +245,46 @@ const searchItems = [
 // 处理搜索
 const handleSearch = (data) => {
     console.log('搜索数据:', data);
+    console.log('开始日期:', data.startDate);
+    console.log('结束日期:', data.endDate);
     // 这里可以发起请求等操作
 };
 
 // 处理重置
 const handleReset = (data) => {
     console.log('重置数据:', data);
+};
+
+// 查看表单数据
+const showFormData = () => {
+    console.log('表单数据:', formData.value);
+    // 检查映射后的字段
+    console.log('活动开始时间:', formData.value.activityStartTime);
+    console.log('活动结束时间:', formData.value.activityEndTime);
+    // 由于keepArrayProp设为true，原数组也会保留
+    console.log('原时间范围数组:', formData.value.timeRange);
+};
+
+// 模拟从API获取数据初始化表单
+const mockInitFormData = () => {
+    // 假设这是从API获取的数据，只有开始和结束时间，没有数组
+    const apiData = {
+        username: 'admin',
+        password: '123456',
+        remember: true,
+        type: '2',
+        activityStartTime: '2023-12-01 09:00:00',
+        activityEndTime: '2023-12-31 18:00:00',
+        timeRange: [] // 添加空数组，会被组件自动填充
+    };
+    
+    // 更新表单数据
+    formData.value = apiData;
+    
+    // CustomForm组件会自动从activityStartTime和activityEndTime字段重建timeRange数组
+    // 无需手动处理，这是rangeMapping功能的优点
+    
+    console.log('表单已初始化');
 };
 </script>
 
@@ -235,6 +311,10 @@ const handleReset = (data) => {
                 :options="formOptions"
                 :items="formItems"
             />
+            <div style="margin-top: 16px;">
+                <el-button type="primary" @click="showFormData">查看表单数据</el-button>
+                <el-button type="success" @click="mockInitFormData">模拟API初始化</el-button>
+            </div>
             
             <h3>表格组件示例</h3>
             <CustomTable :columns="columns" :data="tableData"></CustomTable>
