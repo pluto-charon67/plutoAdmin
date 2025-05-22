@@ -1,17 +1,14 @@
-import { defineComponent, ref, PropType, computed, Fragment, h, watch } from 'vue'
-import { ElButton, ElRow, ElCol, } from 'element-plus'
+import { defineComponent, ref, PropType, computed, Fragment, h, watch, onMounted, onUnmounted } from 'vue'
+import { ElButton } from 'element-plus'
 import { ArrowUpBold, ArrowDownBold } from '@element-plus/icons-vue'
 import { MaSearchProps, MaSearchOptions, MaSearchItem, MaSearchExpose } from './types'
 import { MaFormOptions } from '../CutsomForm/types'
 import CustomForm from '../CutsomForm'
+import { rafThrottle } from '@/utils/throttle'
 
-export default defineComponent({
+export default defineComponent<MaSearchProps>({
   name: 'CustomSearch',
   props: {
-    modelValue: {
-      type: Object as PropType<Record<string, any>>,
-      default: () => ({})
-    },
     defaultValue: {
       type: Object as PropType<Record<string, any>>,
       default: () => ({})
@@ -29,7 +26,7 @@ export default defineComponent({
       default: () => []
     }
   },
-  emits: ['search', 'reset', 'fold', 'update:modelValue'],
+  emits: ['search', 'reset', 'fold'],
   setup(props, { emit, expose, slots }) {
     const formRef = ref()
     const searchOptions = ref<MaSearchOptions>({
@@ -56,20 +53,39 @@ export default defineComponent({
     // 内部维护的表单数据
     const formData = ref<Record<string, any>>({})
 
+    // 添加窗口宽度的响应式引用
+    const windowWidth = ref(window.innerWidth)
+
+    // 更新窗口宽度的处理函数
+    const updateWindowWidth = () => {
+      windowWidth.value = window.innerWidth
+    }
+
+    // 使用 rafThrottle 优化窗口大小变化监听
+    const throttledUpdateWidth = rafThrottle(updateWindowWidth)
+
+    // 组件挂载时添加事件监听
+    onMounted(() => {
+      window.addEventListener('resize', throttledUpdateWidth)
+    })
+
+    // 组件卸载时移除事件监听
+    onUnmounted(() => {
+      window.removeEventListener('resize', throttledUpdateWidth)
+      // 取消可能未执行的节流函数
+      throttledUpdateWidth.cancel()
+    })
+
     // 初始化表单数据
     const initFormData = () => {
       const data: Record<string, any> = {}
       searchItems.value.forEach(item => {
         if (item.prop) {
-          // 优先使用 props.defaultValue，其次使用 options.defaultValue
-          data[item.prop] = props.defaultValue[item.prop] ??
-            searchOptions.value.defaultValue?.[item.prop] ??
-            undefined
+          // 只使用 props.defaultValue
+          data[item.prop] = props.defaultValue[item.prop] ?? undefined
         }
       })
       formData.value = data
-      // 触发更新事件
-      emit('update:modelValue', data)
     }
 
     // 监听 searchItems 变化，重新初始化表单数据
@@ -79,7 +95,7 @@ export default defineComponent({
     }, { deep: true })
 
     // 监听默认值变化
-    watch([() => props.defaultValue, () => props.options?.defaultValue], () => {
+    watch(() => props.defaultValue, () => {
       initFormData()
     }, { deep: true })
 
@@ -96,10 +112,9 @@ export default defineComponent({
       })
     })
 
-    // 计算当前显示的列数
+    // 计算当前显示的列数，使用 windowWidth 响应式引用
     const currentCols = computed(() => {
-      const width = window.innerWidth
-      console.log('width', width,'===')
+      const width = windowWidth.value
       const { cols = {} } = searchOptions.value
       if (width < 768) return cols.xs || 2
       if (width < 992) return cols.sm || 3
@@ -140,7 +155,6 @@ export default defineComponent({
     }
 
     const itemList = computed(() => {
-      console.log('itemList', currentCols.value,'===')
       return displayItems.value.map(item => {
         return {
           ...item,
@@ -158,7 +172,6 @@ export default defineComponent({
       getFold: () => searchOptions.value.fold,
       setSearchForm: (form: Record<string, any>) => {
         formData.value = { ...form }
-        emit('update:modelValue', formData.value)
       },
       getSearchForm: () => formData.value,
       setShowState: (show: boolean) => {
@@ -167,9 +180,6 @@ export default defineComponent({
       getShowState: () => searchOptions.value.show,
       setOptions: (options: MaSearchOptions) => {
         searchOptions.value = options
-        if (options.defaultValue) {
-          initFormData() // 更新默认值时重新初始化
-        }
       },
       getOptions: () => searchOptions.value,
       setFormOptions: (options: MaFormOptions) => {
@@ -184,11 +194,8 @@ export default defineComponent({
       appendItem: (item: MaSearchItem) => {
         searchItems.value.push(item)
         if (item.prop) {
-          const defaultValue = props.defaultValue[item.prop] ??
-            searchOptions.value.defaultValue?.[item.prop] ??
-            undefined
+          const defaultValue = props.defaultValue[item.prop] ?? undefined
           formData.value[item.prop] = defaultValue
-          emit('update:modelValue', formData.value)
         }
       },
       removeItem: (prop: string) => {
@@ -196,7 +203,6 @@ export default defineComponent({
         if (index > -1) {
           searchItems.value.splice(index, 1)
           delete formData.value[prop]
-          emit('update:modelValue', formData.value)
         }
       },
       getItemByProp: (prop: string) => {
@@ -222,7 +228,6 @@ export default defineComponent({
             items={itemList}
             onUpdate:modelValue={(val: Record<string, any>) => {
               formData.value = val
-              emit('update:modelValue', val)
             }}
           >
             {{

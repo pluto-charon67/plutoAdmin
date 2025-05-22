@@ -5,10 +5,15 @@ export type MediaBreakPoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
 // 搜索组件配置项
 export interface MaSearchOptions {
-  defaultValue?: Record<string, any> // 默认值
-  cols?: Partial<Record<MediaBreakPoint, number>> // 媒体查询断点, 默认支持5个断点,每个断点显示多少列
   fold?: boolean // 是否折叠
   foldRows?: number // 折叠行数
+  cols?: {
+    xs?: number;
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+  } // 媒体查询断点, 默认支持5个断点,每个断点显示多少列
   show?: boolean // 是否显示
   text?: {
     searchBtn?: () => string // 搜索按钮文本
@@ -18,7 +23,7 @@ export interface MaSearchOptions {
   }
 }
 
-// 搜索表单项，不继承MaFormItem以避免类型冲突
+// 搜索表单项，继承MaFormItem以避免类型冲突
 export interface MaSearchItem extends Omit<MaFormItem, 'hide' | 'prop'> {
   span?: number // 列宽
   offset?: number // 偏移量
@@ -48,7 +53,6 @@ export interface MaSearchExpose {
 
 // 组件属性
 export interface MaSearchProps {
-  modelValue?: Record<string, any>  // 改为可选
   defaultValue?: Record<string, any>  // 添加默认值属性
   options?: MaSearchOptions // 配置项
   formOptions?: MaFormOptions // 表单配置项
