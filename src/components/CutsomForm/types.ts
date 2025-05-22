@@ -1,5 +1,5 @@
 import { FormInstance, type FormItemProps, type FormProps } from 'element-plus'
-import { Component } from 'vue'
+import { Component, VNode } from 'vue'
 
 export interface LoadingConfig {
   text?: string // 文本
@@ -25,7 +25,7 @@ export interface MaFormOptions extends Partial<Omit<FormProps, 'model'>> {
     justify?: 'start' | 'end' | 'center' | 'space-around' | 'space-between' // 水平对齐方式
     align?: 'top' | 'middle' | 'bottom' // 垂直对齐方式
   }
-  footerSlot?: () => JSX.Element // 底部插槽
+  footerSlot?: () => VNode // 底部插槽
 }
 
 export interface MaFormItem {
@@ -40,11 +40,16 @@ export interface MaFormItem {
     push?: number // 推入
   }
   itemProps?: Omit<Partial<FormItemProps>, 'label' | 'prop'> // 表单项配置
-  itemSlots?: Record<string, (...args: any[]) => JSX.Element> // 表单项插槽
-  render?: string | Component | ((data: any) => JSX.Element) // 渲染
+  itemSlots?: Record<string, (...args: any[]) => VNode> // 表单项插槽
+  render?: string | Component | ((data: any) => VNode) // 渲染
   renderProps?: Record<string, any> // 渲染配置
-  renderSlots?: Record<string, (...args: any[]) => JSX.Element> // 渲染插槽
+  renderSlots?: Record<string, (...args: any[]) => VNode> // 渲染插槽
   children?: MaFormItem[] // 子表单项
+  rangeMapping?: {
+    startProp: string // 开始日期/时间对应的字段名
+    endProp: string // 结束日期/时间对应的字段名
+    keepArrayProp?: boolean // 是否保留原数组字段，默认false
+  } // 范围字段映射配置，用于日期时间范围到单独字段的映射
 }
 
 export interface MaFormExpose {

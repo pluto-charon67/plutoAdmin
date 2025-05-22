@@ -69,6 +69,31 @@ export default defineComponent<MaFormProps>({
       return window.innerWidth <= 768
     }
 
+    // 处理日期范围或时间范围到单独字段的映射
+    const handleRangeFieldMapping = (item: MaFormItem, value: any) => {
+      if (!item.rangeMapping || !Array.isArray(value)) return { [item.prop as string]: value };
+      
+      const { startProp, endProp } = item.rangeMapping;
+      const [startValue, endValue] = value;
+      
+      // 返回映射后的字段，移除原数组字段
+      const result: Record<string, any> = {};
+      if (startProp) result[startProp] = startValue;
+      if (endProp) result[endProp] = endValue;
+      
+      return result;
+    }
+
+    // 从映射的单独字段重建范围数组
+    const rebuildRangeFromMapping = (item: MaFormItem): any[] | null => {
+      if (!item.rangeMapping) return null;
+      
+      const { startProp, endProp } = item.rangeMapping;
+      if (!startProp || !endProp) return null;
+      
+      return [props.modelValue[startProp], props.modelValue[endProp]];
+    }
+
     // 渲染表单项
     const renderFormItem = (item: MaFormItem) => {
       // 如果表单项隐藏或显示为false，则不渲染
@@ -83,9 +108,21 @@ export default defineComponent<MaFormProps>({
 
         // 构建通用的props，用于自动进行绑定数据
         const commonProps = prop ? {
-          modelValue: props.modelValue[prop],
+          modelValue: item.rangeMapping ? rebuildRangeFromMapping(item) ?? props.modelValue[prop] : props.modelValue[prop], // 如果存在范围映射，则使用重建的范围数组，否则使用原始的modelValue
           'onUpdate:modelValue': (val: any) => {
-            emit('update:modelValue', { ...props.modelValue, [prop]: val })
+            let newModelValue;
+            if (item.rangeMapping && Array.isArray(val)) {
+              // 处理范围映射
+              const mappedValues = handleRangeFieldMapping(item, val);
+              newModelValue = { ...props.modelValue, ...mappedValues };
+              // 如果保留原数组字段，则也更新它
+              if (item.rangeMapping.keepArrayProp) {
+                newModelValue[prop as string] = val;
+              }
+            } else {
+              newModelValue = { ...props.modelValue, [prop as string]: val };
+            }
+            emit('update:modelValue', newModelValue);
           }
         } : {}
 
