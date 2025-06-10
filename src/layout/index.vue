@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Tags from '@/layout/components/tags/index.vue';
+import Content from '@/layout/components/content/index.vue';
 import { getAsyncRoutes } from '@/api/router/index.ts';
 
 getAsyncRoutes().then(res => {
@@ -10,6 +11,7 @@ getAsyncRoutes().then(res => {
 <template>
     <div class="app-wrapper">
         <Tags></Tags>
+        <Content></Content>
     </div>
 </template>
 
