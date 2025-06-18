@@ -3,10 +3,8 @@ import vue from '@vitejs/plugin-vue';
 import AutoImport from "unplugin-auto-import/vite";
 import { vitePluginFakeServer } from "vite-plugin-fake-server";
 import vueJsx from '@vitejs/plugin-vue-jsx';
-import Components from 'unplugin-vue-components/vite';
 import Icons from 'unplugin-icons/vite';
 import IconsResolver from 'unplugin-icons/resolver';
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
 
 export function getPluginList(): PluginOption[] {
     return  [
@@ -28,33 +26,9 @@ export function getPluginList(): PluginOption[] {
             ],
             // 自动导入解析器配置
             resolvers: [
-                // 自动导入element plus的相关函数，如ElMessage，ElMessageBox等，带有对应的样式
-                ElementPlusResolver(),
-                // 自动导入图标组件，配置前缀为 Icon
-                IconsResolver({
-                    enabledCollections: ['ep'],
-                }),
             ],
             // 生成 TypeScript 声明文件的位置
             dts: "./src/auto-import.d.ts",
-        }),
-        // 配置组件自动导入插件
-        Components({
-            // 指定自动导入组件的位置
-            dirs: [],
-            // 组件的有效文件扩展名，一般是vue和tsx
-            extensions: [],
-            // TypeScript 组件声明文件位置
-            dts: 'src/components.d.ts',
-            // 自动导入解析器配置
-            resolvers: [
-                // 自动导入 Element Plus 组件
-                ElementPlusResolver(),
-                // 自动导入图标组件
-                IconsResolver({
-                    enabledCollections: ['ep'],
-                }),
-            ],
         }),
         // 配置图标自动导入
         Icons({

@@ -6,6 +6,8 @@ import { setupSrore } from '@/store';
 import { useElementPlus } from '@/plugins/elementPlus.ts';
 import 'element-plus/dist/index.css';
 
+import { useCustomIcon } from '@/components/CustomIcon';
+
 import { MotionPlugin } from '@vueuse/motion';
 
 // 引入公共样式
@@ -18,5 +20,6 @@ setupSrore(app); // 注册pinia
 app.use(router);
 app.use(MotionPlugin);
 app.use(useElementPlus);
+app.use(useCustomIcon); // 注册自定义图标组件
 
 app.mount('#app');

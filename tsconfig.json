@@ -22,7 +22,7 @@
       "DOM"
     ],
     // 指定 TypeScript 编译器在编译时需要加载的类型声明文件,通常该声明文件在node_modules/@type中
-    "types": ["node","vite/client"], // 识别vite的特有类型
+    "types": ["node","vite/client", "unplugin-icons/types/vue"], // 识别vite的特有类型
     "baseUrl": ".", // 导入模块时，相对于这个路径进行导入解析，防止模块导入的ts报错
     // 别名映射或者路径重定向的类型声明
     "paths": {

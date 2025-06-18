@@ -1,10 +1,12 @@
 import { defineComponent, ref, PropType, computed, Fragment, h, watch, onMounted, onUnmounted } from 'vue'
 import { ElButton } from 'element-plus'
-import { ArrowUpBold, ArrowDownBold } from '@element-plus/icons-vue'
 import { MaSearchProps, MaSearchOptions, MaSearchItem, MaSearchExpose } from './types'
 import { MaFormOptions } from '../CutsomForm/types'
 import CustomForm from '../CutsomForm'
 import { rafThrottle } from '@/utils/throttle'
+import { LocalIcon } from '@/components/CustomIcon'
+import DownIcon from "~icons/ic/round-keyboard-arrow-down";
+import UpIcon from "~icons/ic/round-keyboard-arrow-up";
 
 export default defineComponent<MaSearchProps>({
   name: 'CustomSearch',
@@ -252,8 +254,8 @@ export default defineComponent<MaSearchProps>({
                           ? searchOptions.value.text?.isFoldBtn?.()
                           : searchOptions.value.text?.notFoldBtn?.(),
                         icon: () => searchOptions.value.fold
-                          ? <ArrowDownBold /> 
-                          : <ArrowUpBold />
+                          ? <LocalIcon icon={DownIcon} /> 
+                          : <LocalIcon icon={UpIcon} />
                       }}
                     </ElButton>
                   )}
