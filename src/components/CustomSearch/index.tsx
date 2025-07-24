@@ -157,7 +157,7 @@ export default defineComponent<MaSearchProps>({
     }
 
     const itemList = computed(() => {
-      return displayItems.value.map(item => {
+      return displayItems.value?.map(item => {
         return {
           ...item,
           cols: {
@@ -165,7 +165,7 @@ export default defineComponent<MaSearchProps>({
             ...item.cols
           }
         };
-      });
+      }) ?? [];
     })
     // 暴露方法
     expose({
@@ -227,7 +227,7 @@ export default defineComponent<MaSearchProps>({
               },
               ...props.formOptions
             }}
-            items={itemList}
+            items={itemList.value}
             onUpdate:modelValue={(val: Record<string, any>) => {
               formData.value = val
             }}

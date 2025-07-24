@@ -43,8 +43,8 @@ const isShow = defineModel<boolean>({default: false});
 
 </script>
 
-<template>
-  <el-drawer v-model="isShow" v-bind="$attrs" v-loading="$attrs.loading ?? false">
+<template v-loading="$attrs.loading ?? false">
+  <el-drawer v-model="isShow" v-bind="$attrs">
     <template #default>
         <div>
             <slot></slot>

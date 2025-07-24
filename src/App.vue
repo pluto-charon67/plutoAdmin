@@ -15,7 +15,7 @@ const localeOptions = {
     en: { ...en },
 };
 const currentLocale = computed(() => {
-    return '';
+    return localeOptions['zh'] || localeOptions['en'];
 });
 </script>
 
