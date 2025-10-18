@@ -13,6 +13,8 @@ declare global {
         keepAlive?: boolean; // 该菜单的页面是否要缓存
         hiddenTag?: boolean; // 当前菜单是否要添加至标签页，默认为false
         fixedTag?: boolean; // 当前菜单是否需要固定至标签页且不可被关闭，默认为false
+        dynamicTitle?: boolean; // 是否支持动态标题（用于详情页等）
+        titleTemplate?: string; // 动态标题模板，如 "用户详情-{id}"
     }
 
     interface RouteConfig {
@@ -22,6 +24,14 @@ declare global {
         redirect?: string; // 路由重定向
         meta?: CustomRouteMeta; // 路由元数据
         children?: Array<RouteConfig>; // 子路由
+    }
+
+    // 标签页专用的数据结构
+    interface TabItem extends RouteConfig {
+        tabKey?: string; // 标签页唯一标识（包含参数信息）
+        fullPath?: string; // 完整路径（包含参数和查询）
+        params?: Record<string, any>; // 路由参数
+        query?: Record<string, any>; // 查询参数
     }
 }
 
